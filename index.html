@@ -463,6 +463,14 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
 #welcome { position: fixed; inset: 0; background: rgba(27, 28, 41, .55); display: grid; place-items: center; z-index: 60; padding: 16px; }
 #welcome .step { cursor: pointer; }
 
+/* ログイン画面・保存の競合 */
+#loginGate { position: fixed; inset: 0; background: var(--bg, #f6f7fb); display: grid; place-items: center; z-index: 70; padding: 16px; overflow-y: auto; }
+#loginGate .logo { display: grid; place-items: center; }
+#loginGate .logo svg { width: 22px; height: 22px; }
+#loginGate input { font-size: 16px; }
+#conflictBox { position: fixed; inset: 0; background: rgba(27, 28, 41, .55); display: grid; place-items: center; z-index: 65; padding: 16px; }
+#conflictBox .step { cursor: pointer; }
+
 </style>
 </head>
 <body>
@@ -513,7 +521,12 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
     status: 'local',     // local / file / need-permission / saving / error
     lastSaved: null,
     dirty: false,
-    error: ''
+    error: '',
+    mode: 'local',       // local（このブラウザ／帳簿ファイル） / cloud（ログインしてサーバーに保存）
+    user: '',
+    cloudEtag: null,     // サーバー上のデータの版
+    pending: false,      // サーバーにまだ送っていない変更がある
+    rev: 0
   };
 
   function idb() {
@@ -571,11 +584,116 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
     }
     L.firstRun = !L.handle && !isLedger(L.data);
     if (!isLedger(L.data)) L.data = emptyData();
+    try { await cloudStart(); }
+    catch (e) {
+      const rec = await idbGet('cloud').catch(() => null);
+      if (rec && rec.user) {   // サーバーが一時的に使えない：手元の控えで続ける
+        Object.assign(L, { mode: 'cloud', user: rec.user, cloudEtag: rec.etag, pending: !!rec.pending, status: 'offline', firstRun: false, notice: 'サーバーにつながらないため、この端末の控えを表示しています。つながると変更を送ります。' });
+      } else {
+        await UI.fatal('サーバーから帳簿を読み込めませんでした。' + (e.message || e));
+      }
+    }
   }
+
+  /* ───────── クラウド保存（Vercel にログインして使うとき） ───────── */
+  const CLOUD_OK = /^https?:$/.test(location.protocol);
+  const hasContent = d => isLedger(d) && Object.keys(d.sheets).some(k => k !== '設定' && (d.sheets[k] || []).length > 1);
+  async function api(method, url, body) {
+    const r = await fetch(url, { method, cache: 'no-store', credentials: 'same-origin',
+      headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
+    let j = {}; try { j = await r.json(); } catch (e) { }
+    return { status: r.status, body: j };
+  }
+  async function cloudStart() {
+    if (!CLOUD_OK) return;
+    let me;
+    try { me = await api('GET', '/api/me'); } catch (e) {
+      // 通信できない：以前クラウドで使っていた端末なら、手元の控えで続けて、つながったら送る
+      const rec = await idbGet('cloud').catch(() => null);
+      if (rec && rec.user) { Object.assign(L, { mode: 'cloud', user: rec.user, cloudEtag: rec.etag, pending: !!rec.pending, status: 'offline', firstRun: false }); }
+      return;
+    }
+    if (me.status === 404) return;                         // サーバー機能のない場所（ファイルを直接開いたときなど）
+    let user = me.status === 200 ? me.body.user : await UI.login();
+    L.mode = 'cloud'; L.user = user; L.firstRun = false;
+    const rec = (await idbGet('cloud').catch(() => null)) || {};
+    const local = L.data;
+    const r = await api('GET', '/api/data');
+    if (r.status === 401) { user = await UI.login(); return cloudStart(); }
+    if (r.status !== 200) throw new Error('帳簿データを読み込めませんでした（' + r.status + '）');
+    if (!r.body.exists) {
+      // サーバーにまだ帳簿がない：この端末のデータを最初の帳簿として送る
+      L.cloudEtag = null;
+      if (hasContent(local)) { L.data = local; L.pending = true; L.notice = 'この端末の帳簿をサーバーに保存しました。これからはログインすれば、どの端末でも同じ帳簿を使えます。'; }
+    } else if (rec.user && rec.pending && rec.etag === r.body.etag && isLedger(local)) {
+      // 前回送れなかった変更があり、その間ほかの人は保存していない → この端末の内容を送る
+      L.data = local; L.cloudEtag = r.body.etag; L.pending = true;
+    } else {
+      if (hasContent(local) && (rec.pending || !rec.user) && JSON.stringify(local.sheets) !== JSON.stringify(r.body.data.sheets)) {
+        await idbSet('localCopy', local);
+        L.notice = 'この端末に、サーバーと違う帳簿データが残っていました。サーバーの最新の帳簿を表示しています。この端末のデータは「設定 → この端末に残っていたデータを書き出す」で取り出せます。';
+      }
+      L.data = r.body.data; L.cloudEtag = r.body.etag; L.pending = false;
+      await idbSet('db', L.data);
+    }
+    L.status = 'cloud';
+    await saveCloudRec();
+    if (L.pending) pushSoon(1500);
+  }
+  const saveCloudRec = () => idbSet('cloud', { user: L.user, etag: L.cloudEtag, pending: L.pending }).catch(() => { });
+  let pushTimer = null, pushing = null;
+  function pushSoon(ms) { if (!pushTimer) pushTimer = setTimeout(() => { pushTimer = null; pushCloud(); }, ms); }
+  async function pushCloud(force) {
+    clearTimeout(pushTimer); pushTimer = null;
+    if (L.mode !== 'cloud' || (!L.pending && !force)) return;
+    if (pushing) return pushing;
+    pushing = (async () => {
+      const rev = L.rev;
+      L.status = 'saving'; UI.status();
+      let r;
+      try { r = await api('PUT', '/api/data', { etag: L.cloudEtag, data: L.data }); }
+      catch (e) { L.status = 'offline'; UI.status(); setTimeout(() => pushSoon(1000), 60000); return; }
+      if (r.status === 200) {
+        L.cloudEtag = r.body.etag; L.data.savedAt = r.body.savedAt; L.data.savedBy = r.body.savedBy;
+        if (L.rev === rev) L.pending = false;
+        L.status = 'cloud'; L.lastSaved = new Date(); L.error = '';
+        await saveCloudRec(); await idbSet('db', L.data);
+        if (L.pending) pushSoon(30000);
+      } else if (r.status === 409) {
+        L.status = 'conflict'; UI.conflict();
+      } else if (r.status === 401) {
+        L.status = 'error'; L.error = 'ログインの期限が切れました'; UI.status();
+        await UI.login(); L.status = 'cloud'; pushing = null; return pushCloud(true);
+      } else {
+        L.status = 'error'; L.error = r.body.error || ('保存できませんでした（' + r.status + '）');
+        setTimeout(() => pushSoon(1000), 60000);
+      }
+      UI.status(); UI.card();
+    })().finally(() => { pushing = null; });
+    return pushing;
+  }
+  /** ほかの人が保存した新しい帳簿があれば読み込み直す（この端末に未送信の変更がないときだけ） */
+  async function pullCloud() {
+    if (L.mode !== 'cloud' || L.pending || L.dirty || pushing) return;
+    try {
+      const r = await api('GET', '/api/data?etag=' + encodeURIComponent(L.cloudEtag || ''));
+      if (r.status === 200 && r.body.exists && !r.body.unchanged && r.body.etag !== L.cloudEtag) {
+        await idbSet('db', r.body.data); L.cloudEtag = r.body.etag; await saveCloudRec();
+        toast('ほかの端末で更新された帳簿を読み込みます');
+        setTimeout(() => location.reload(), 700);
+      }
+    } catch (e) { }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (L.mode !== 'cloud') return;
+    if (document.visibilityState === 'hidden') { if (L.dirty) saveNow(); if (L.pending) pushCloud(); }
+    else pullCloud();
+  });
+  window.addEventListener('online', () => { if (L.mode === 'cloud' && L.pending) pushCloud(); });
 
   let saveTimer = null, saving = Promise.resolve();
   function markDirty() {
-    L.dirty = true;
+    L.dirty = true; L.rev++;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveNow, 400);
     UI.status();
@@ -591,7 +709,11 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
       UI.status();
       try {
         await idbSet('db', L.data);
-        if (L.handle && (prev === 'file' || prev === 'saving')) {
+        if (L.mode === 'cloud') {
+          L.pending = true; await saveCloudRec();
+          if (L.status === 'saving' && !pushing) L.status = 'cloud';
+          pushSoon(30000);          // 変更をまとめて、30秒ごとにサーバーへ送る
+        } else if (L.handle && (prev === 'file' || prev === 'saving')) {
           const w = await L.handle.createWritable();
           await w.write(JSON.stringify(L.data));
           await w.close();
@@ -608,7 +730,11 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
     });
     return saving;
   }
-  window.addEventListener('beforeunload', e => { if (L.dirty) { saveNow(); e.preventDefault(); e.returnValue = ''; } });
+  window.addEventListener('beforeunload', e => {
+    if (L.dirty) saveNow();
+    if (L.mode === 'cloud' && L.pending) pushCloud();
+    if (L.dirty || (L.mode === 'cloud' && L.pending)) { e.preventDefault(); e.returnValue = ''; }
+  });
 
   /* ───────── Apps Script サービスの置き換え ───────── */
   let writes = 0;
@@ -817,7 +943,8 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
       const d = JSON.parse(t);
       if (!isLedger(d)) throw new Error('青色帳簿のバックアップではありません');
       await idbSet('db', d);
-      if (L.handle && L.status === 'file') { const w = await L.handle.createWritable(); await w.write(JSON.stringify(d)); await w.close(); }
+      if (L.mode === 'cloud') { L.data = d; L.dirty = true; L.rev++; await saveNow(); await pushCloud(true); if (L.status === 'conflict') return; }
+      else if (L.handle && L.status === 'file') { const w = await L.handle.createWritable(); await w.write(JSON.stringify(d)); await w.close(); }
       location.reload();
     }).catch(e => toast(e.message, true));
   }
@@ -853,7 +980,14 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
         'need-permission': ['warn', '要確認', '帳簿ファイルへの保存を再開するには、押して許可してください'],
         error: ['warn', '保存エラー', L.error]
       };
+      Object.assign(map, {
+        cloud: ['ok', '保存済み', 'サーバーに保存しています（ログイン中：' + L.user + '）'],
+        offline: ['warn', 'オフライン', 'インターネットにつながると、変更をサーバーに送ります'],
+        conflict: ['warn', '要確認', 'ほかの人が先に保存しました。押して選んでください']
+      });
+      if (L.mode === 'cloud' && L.status === 'saving') map.saving = ['', '送信中…', ''];
       const m = map[L.status] || map.local;
+      if (L.mode === 'cloud' && L.pending && L.status === 'cloud') { b.className = 'icon-btn txt save-'; b.title = '30秒ほどでサーバーに保存します（押すとすぐ保存）'; b.innerHTML = '<span class="dot"></span>保存待ち'; return; }
       const label = L.dirty && L.status !== 'saving' ? '保存待ち' : m[1];
       b.className = 'icon-btn txt save-' + m[0];
       b.title = m[2];
@@ -867,6 +1001,7 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
     },
     card() {
       const el = $('#dataCard'); if (!el) return;
+      if (L.mode === 'cloud') return UI.cloudCard(el);
       const where = L.status === 'file' || L.status === 'saving' ? `帳簿ファイル「<b>${esc(L.handle.name)}</b>」（変更すると自動で保存されます）`
         : L.status === 'need-permission' ? `帳簿ファイル「<b>${esc(L.handle.name)}</b>」（保存を続けるには許可が必要です）`
           : 'このブラウザの中だけ（ブラウザのデータを消すと失われます）';
@@ -902,10 +1037,122 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
         }
         exportBackup();
         L.data = emptyData();
-        L.dirty = true;
-        saveNow().then(() => setTimeout(() => location.reload(), 600));
+        L.dirty = true; L.rev++;
+        saveNow().then(() => (L.mode === 'cloud' ? pushCloud(true) : null)).then(() => setTimeout(() => location.reload(), 600));
       });
       const rs = $('#dcRs', el); if (rs) rs.onchange = () => rs.files[0] && importBackup(rs.files[0]);
+    },
+    async cloudCard(el) {
+      const copy = await idbGet('localCopy').catch(() => null);
+      const by = L.data.savedBy ? `（${esc(L.data.savedBy)}）` : '';
+      el.innerHTML = `<h2>データの保存先</h2>
+        <p style="margin-top:-6px">いまの保存先：<b>サーバー（ログインした人だけが見られます）</b><br>
+          <span class="small muted">ログイン中：<b>${esc(L.user)}</b>　最後の保存：${L.data.savedAt ? new Date(L.data.savedAt).toLocaleString('ja-JP') + by : 'まだありません'}</span></p>
+        <p class="small muted">変更は30秒ごとにまとめてサーバーへ送ります。ほかの人の変更は、アプリを開き直したときに読み込まれます。サーバーには1日1回、30日分の控えが自動で残ります。</p>
+        ${L.pending ? '<div class="note">まだサーバーに送っていない変更があります。</div>' : ''}
+        <div class="row">
+          <button class="btn primary" id="dcPush" ${L.pending ? '' : 'disabled'}>今すぐ保存</button>
+          <button class="btn" id="dcPull" ${L.pending ? 'disabled' : ''}>最新を読み込む</button>
+          <button class="btn" id="dcOut">ログアウト</button>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" id="dcBk">バックアップを書き出す</button>
+          <label class="btn" style="cursor:pointer">バックアップから戻す<input type="file" id="dcRs" accept=".json,application/json" hidden></label>
+          <button class="btn" id="dcXl">帳簿をExcelで書き出す</button>
+          ${copy ? '<button class="btn" id="dcCopy">この端末に残っていたデータを書き出す</button>' : ''}
+        </div>
+        <details style="margin-top:14px"><summary class="small" style="cursor:pointer">すべてのデータを消して最初からやり直す</summary>
+          <p class="small muted">サーバーの帳簿を空にします（一緒に使っている人の画面からも消えます）。消す前に、念のためバックアップを自動でダウンロードします。</p>
+          <button class="btn red" id="dcReset">すべて消す</button></details>
+        <p class="small muted">AIのAPIキーは、端末ごとにこのブラウザの中だけに保存されます（サーバーには送りません）。</p>`;
+      const on = (id, fn) => { const b = $(id, el); if (b) b.onclick = fn; };
+      on('#dcPush', async () => { if (L.dirty) await saveNow(); await pushCloud(true); if (L.status === 'cloud') toast('サーバーに保存しました'); });
+      on('#dcPull', () => { L.cloudEtag = L.cloudEtag || ''; pullCloud().then(() => toast('最新の状態です')); });
+      on('#dcOut', guard(UI.logout));
+      on('#dcBk', exportBackup);
+      on('#dcXl', () => { exportExcel(); });
+      on('#dcCopy', () => download('aoiro-tanmatsu_' + stamp() + '.json', new Blob([JSON.stringify(copy)], { type: 'application/json' })));
+      on('#dcReset', function () {
+        const b = this;
+        if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = 'もう一度押すと、すべて消します'; setTimeout(() => { delete b.dataset.armed; b.textContent = 'すべて消す'; }, 4000); return; }
+        exportBackup(); L.data = emptyData(); L.dirty = true; L.rev++;
+        saveNow().then(() => pushCloud(true)).then(() => setTimeout(() => location.reload(), 600));
+      });
+      const rs = $('#dcRs', el); if (rs) rs.onchange = () => rs.files[0] && importBackup(rs.files[0]);
+    },
+    async logout() {
+      if (L.dirty) await saveNow();
+      if (L.pending) { await pushCloud(true); if (L.pending) return toast('まだ保存できていない変更があるため、ログアウトを止めました。インターネット接続を確かめてください', true); }
+      await api('POST', '/api/logout');
+      await idbDel('db').catch(() => { }); await idbDel('cloud').catch(() => { }); await idbDel('localCopy').catch(() => { });
+      location.reload();
+    },
+    fatal(msg) {
+      return new Promise(() => {
+        const m = document.createElement('div');
+        m.id = 'loginGate';
+        m.innerHTML = `<div class="card" style="max-width:420px;width:100%;margin:0"><h2 style="font-size:20px">帳簿を開けませんでした</h2>
+          <p>${esc(msg)}</p><p class="small muted">インターネット接続を確かめて、もう一度お試しください。</p>
+          <button class="btn primary" onclick="location.reload()">もう一度読み込む</button></div>`;
+        document.body.appendChild(m);
+      });
+    },
+    /** ログイン画面（ログインできるまで待つ） */
+    login() {
+      return new Promise(resolve => {
+        const old = document.getElementById('loginGate'); if (old) old.remove();
+        const m = document.createElement('div');
+        m.id = 'loginGate';
+        m.innerHTML = `<form class="card" autocomplete="on" style="max-width:420px;width:100%;margin:0">
+          <div class="brand" style="margin-bottom:14px"><div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V8l8-5 8 5v12"/><path d="M9 20v-6h6v6"/></svg></div><div class="brand-name" style="display:block">青色帳簿</div></div>
+          <h2 style="font-size:22px;margin:0 0 4px">ログイン</h2>
+          <p class="small muted" style="margin:0 0 14px">帳簿を見るには、IDとパスワードを入れてください。</p>
+          <label class="f">ID<input name="username" id="lgU" autocomplete="username" autocapitalize="off" spellcheck="false" required></label>
+          <label class="f" style="margin-top:10px">パスワード<input name="password" id="lgP" type="password" autocomplete="current-password" required></label>
+          <div class="note warn" id="lgErr" hidden style="margin-top:12px"></div>
+          <button class="btn primary" id="lgGo" type="submit" style="width:100%;justify-content:center;margin-top:16px">ログイン</button>
+          <p class="small muted" style="margin:12px 0 0">この端末でログインしたままになります（30日間）。共用の端末では、使い終わったら設定からログアウトしてください。</p></form>`;
+        document.body.appendChild(m);
+        const err = $('#lgErr', m), go = $('#lgGo', m);
+        setTimeout(() => $('#lgU', m).focus(), 50);
+        $('form', m).onsubmit = async ev => {
+          ev.preventDefault();
+          go.disabled = true; go.textContent = '確認しています…'; err.hidden = true;
+          try {
+            const r = await api('POST', '/api/login', { user: $('#lgU', m).value, pass: $('#lgP', m).value });
+            if (r.status === 200) { m.remove(); resolve(r.body.user); return; }
+            err.textContent = r.body.error || 'ログインできませんでした';
+          } catch (e) { err.textContent = 'サーバーにつながりませんでした。インターネット接続を確かめてください'; }
+          err.hidden = false; go.disabled = false; go.textContent = 'ログイン'; $('#lgP', m).select();
+        };
+      });
+    },
+    /** ほかの人が先に保存していたとき */
+    conflict() {
+      if (document.getElementById('conflictBox')) return;
+      UI.status();
+      const m = document.createElement('div');
+      m.id = 'conflictBox';
+      m.innerHTML = `<div class="card" role="dialog" aria-modal="true" style="max-width:520px;width:100%;margin:0">
+        <h2 style="font-size:20px">ほかの人が先に保存しました</h2>
+        <p>この端末で帳簿を変えている間に、ほかの端末（またはほかの人）が帳簿を保存しました。どちらにするか選んでください。</p>
+        <div class="steps" style="grid-template-columns:1fr">
+          <div class="step" id="cfLoad"><div class="n">1</div><div><div class="t">最新の帳簿を読み込む（おすすめ）</div><div class="d">この端末での直近の変更は、念のためファイルにダウンロードしてから破棄します。必要なら入力し直してください。</div></div></div>
+          <div class="step" id="cfMine"><div class="n">2</div><div><div class="t">この端末の内容で上書きする</div><div class="d">ほかの人の直近の変更が消えます。ほかの人が何も変えていないとわかっているときだけ選んでください。</div></div></div>
+        </div></div>`;
+      document.body.appendChild(m);
+      $('#cfLoad', m).onclick = async () => {
+        download('aoiro-mihozon_' + stamp() + '.json', new Blob([JSON.stringify(L.data)], { type: 'application/json' }));
+        const r = await api('GET', '/api/data');
+        if (r.status === 200 && r.body.exists) { await idbSet('db', r.body.data); L.cloudEtag = r.body.etag; L.pending = false; await saveCloudRec(); }
+        location.reload();
+      };
+      $('#cfMine', m).onclick = async () => {
+        const r = await api('GET', '/api/data');
+        if (r.status === 200 && r.body.exists) L.cloudEtag = r.body.etag;
+        m.remove(); L.status = 'cloud'; await pushCloud(true);
+        if (L.status === 'cloud') toast('この端末の内容で保存しました');
+      };
     },
     welcome() {
       if (!L.firstRun) return;
@@ -933,7 +1180,10 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
       if (old && !$('#saveBtn')) {
         const b = document.createElement('button');
         b.id = 'saveBtn'; b.type = 'button';
-        b.onclick = () => (L.status === 'need-permission' ? guard(reconnect)() : window.go && window.go('settings'));
+        b.onclick = () => (L.status === 'need-permission' ? guard(reconnect)()
+          : L.status === 'conflict' ? UI.conflict()
+            : L.mode === 'cloud' && (L.pending || L.dirty) ? (async () => { if (L.dirty) await saveNow(); await pushCloud(true); if (L.status === 'cloud') toast('サーバーに保存しました'); })()
+              : window.go && window.go('settings'));
         old.replaceWith(b);
       }
       if (!$('#fileBar')) {
@@ -944,7 +1194,11 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
       new MutationObserver(() => { const c = $('#dataCard'); if (c && !c.dataset.done) { c.dataset.done = '1'; UI.card(); } })
         .observe($('#main'), { childList: true, subtree: true });
       UI.status();
-      UI.welcome();
+      READY.then(() => {
+        UI.status();
+        if (L.notice) { const n = L.notice; L.notice = ''; setTimeout(() => toast(n), 1200); }
+        if (L.mode !== 'cloud') UI.welcome();
+      });
     }
   };
 

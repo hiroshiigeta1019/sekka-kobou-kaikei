@@ -471,6 +471,224 @@ tr.dim td { color: var(--muted); text-decoration: line-through; text-decoration-
 #conflictBox { position: fixed; inset: 0; background: rgba(27, 28, 41, .55); display: grid; place-items: center; z-index: 65; padding: 16px; }
 #conflictBox .step { cursor: pointer; }
 
+/* ───────── かんたん画面（スマホ・はじめての人向け） ─────────
+   色：墨紺 #1E2A5A ／ 藤 #6B5BD6 ／ 白磁 #F4F5FB ／ 翡翠 #2E9E7B ／ 琥珀 #E3A13B ／ 珊瑚 #D9534F
+   文字：Zen Maru Gothic（丸ゴシック・読みやすさ優先） */
+#easy, #ezNav, .ez-cta, .ez-sheet {
+  --ez-ink: #1E2A5A; --ez-ink-2: #4A5378; --ez-mute: #7B82A0; --ez-line: #E3E5F0;
+  --ez-bg: #F4F5FB; --ez-card: #FFFFFF; --ez-fuji: #6B5BD6; --ez-fuji-soft: #ECE9FC;
+  --ez-jade: #2E9E7B; --ez-jade-soft: #E3F4EE; --ez-amber: #E3A13B; --ez-amber-soft: #FCF1DD; --ez-coral: #D9534F;
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif; color: #1E2A5A;
+}
+#easy {
+  position: fixed; inset: 0; z-index: 30; background: var(--ez-bg); color: var(--ez-ink);
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  font-size: 18px; line-height: 1.6; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 0 0 calc(104px + env(safe-area-inset-bottom));
+  font-variant-numeric: tabular-nums; -webkit-tap-highlight-color: transparent;
+}
+body.ez-on { overflow: hidden; }
+body.ez-on .shell, body.ez-on #tabbar, body.ez-on #moreSheet { display: none !important; }
+#easy *, #easy *::before, #easy *::after, #ezNav *, .ez-cta *, .ez-sheet * { box-sizing: border-box; }
+#easy button, #ezNav button, .ez-cta button, .ez-sheet button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; padding: 0; margin: 0; -webkit-appearance: none; appearance: none; }
+#easy :focus-visible, #ezNav :focus-visible, .ez-cta :focus-visible, .ez-sheet :focus-visible { outline: 3px solid var(--ez-fuji); outline-offset: 3px; border-radius: 12px; }
+#easy input { font: inherit; color: inherit; }
+.ez-wrap { max-width: 560px; margin: 0 auto; padding: 0 16px; }
+
+/* 上部 */
+.ez-top { display: flex; align-items: center; gap: 12px; padding: calc(14px + env(safe-area-inset-top)) 16px 6px; max-width: 560px; margin: 0 auto; }
+.ez-hello { flex: 1; min-width: 0; }
+.ez-hello b { display: block; font-size: 24px; line-height: 1.35; font-weight: 700; }
+.ez-hello span { font-size: 15px; color: var(--ez-mute); }
+.ez-round { width: 52px; height: 52px; border-radius: 50%; background: var(--ez-card); display: grid; place-items: center; box-shadow: 0 6px 18px -10px rgba(30, 42, 90, .45); flex: none; }
+.ez-round svg { width: 26px; height: 26px; }
+
+/* 売上のトレイ（今月売れた石を玉で見せる） */
+.ez-tray { margin: 14px 0 6px; border-radius: 30px; padding: 22px 20px 18px; color: #fff; position: relative; overflow: hidden;
+  background: radial-gradient(120% 90% at 85% 0%, #3B4A8F 0%, rgba(59, 74, 143, 0) 60%), linear-gradient(160deg, #24316A 0%, #1E2A5A 55%, #182148 100%);
+  box-shadow: 0 22px 40px -24px rgba(30, 42, 90, .8); }
+.ez-tray .lbl { font-size: 16px; color: #C9CEEA; }
+.ez-tray .big { font-size: 44px; font-weight: 700; line-height: 1.15; letter-spacing: .01em; margin: 2px 0 4px; }
+.ez-tray .big small { font-size: 22px; font-weight: 700; margin-left: 4px; }
+.ez-tray .cmp { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; padding: 4px 12px; border-radius: 999px; background: rgba(255, 255, 255, .12); }
+.ez-tray .cmp.up { color: #9BE7C9; } .ez-tray .cmp.down { color: #FFC2B8; }
+.ez-beads { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px; margin-top: 16px; min-height: 58px; padding: 10px 12px; border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .1)); box-shadow: inset 0 2px 6px rgba(0, 0, 0, .25); }
+.ez-beads .none { font-size: 15px; color: #C9CEEA; align-self: center; }
+.ez-beads svg { display: block; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .35)); }
+.ez-tray .sub { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; font-size: 15px; color: #C9CEEA; }
+.ez-tray .sub b { color: #fff; font-size: 17px; }
+
+/* 見出し */
+.ez-h { font-size: 20px; font-weight: 700; margin: 26px 2px 12px; }
+.ez-q { font-size: 26px; font-weight: 700; line-height: 1.4; margin: 6px 2px 6px; }
+.ez-hint { font-size: 16px; color: var(--ez-ink-2); margin: 0 2px 16px; }
+
+/* 大きなタイル（やりたいこと） */
+.ez-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ez-tile { background: var(--ez-card); border-radius: 26px; padding: 16px 14px 16px; text-align: left; min-height: 172px; display: flex; flex-direction: column;
+  box-shadow: 0 1px 0 var(--ez-line), 0 14px 26px -20px rgba(30, 42, 90, .5); transition: transform .12s; }
+.ez-tile:active { transform: scale(.97); }
+.ez-tile .art { width: 76px; height: 76px; margin-bottom: auto; }
+.ez-tile b { font-size: 20px; line-height: 1.35; margin-top: 10px; display: block; }
+.ez-tile span { font-size: 14px; color: var(--ez-mute); line-height: 1.45; }
+
+/* 一覧の行 */
+.ez-list { background: var(--ez-card); border-radius: 24px; padding: 4px 0; box-shadow: 0 1px 0 var(--ez-line), 0 14px 26px -22px rgba(30, 42, 90, .45); }
+.ez-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; width: 100%; text-align: left; min-height: 72px; }
+.ez-row + .ez-row { border-top: 1px solid var(--ez-line); }
+.ez-row .ic { width: 48px; height: 48px; flex: none; display: grid; place-items: center; border-radius: 16px; background: var(--ez-bg); }
+.ez-row .ic svg { width: 30px; height: 30px; }
+.ez-row .tx { flex: 1; min-width: 0; }
+.ez-row .tx b { display: block; font-size: 17px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ez-row .tx span { font-size: 14px; color: var(--ez-mute); }
+.ez-row .amt { font-size: 18px; font-weight: 700; white-space: nowrap; }
+.ez-row .amt.in { color: var(--ez-jade); }
+.ez-row .chev { color: var(--ez-mute); font-size: 22px; }
+.ez-empty { text-align: center; padding: 28px 16px; color: var(--ez-ink-2); font-size: 16px; }
+
+/* 下のメニュー */
+#ezNav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; background: rgba(255, 255, 255, .97); border-top: 1px solid var(--ez-line);
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(5, 1fr); align-items: end;
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+#ezNav button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 13px; font-weight: 700; color: var(--ez-mute); padding: 4px 0; min-height: 60px; justify-content: flex-end; }
+#ezNav button svg { width: 28px; height: 28px; }
+#ezNav button.on { color: var(--ez-fuji); }
+#ezNav .plus { position: relative; }
+#ezNav .plus i { width: 66px; height: 66px; border-radius: 50%; display: grid; place-items: center; color: #fff; margin-top: -30px; margin-bottom: 2px;
+  background: linear-gradient(160deg, #8273EA, #5A49CC); box-shadow: 0 12px 22px -10px rgba(90, 73, 204, .9), 0 0 0 6px #fff; }
+#ezNav .plus i svg { width: 32px; height: 32px; }
+#ezNav .plus { color: var(--ez-ink); }
+
+/* 手順（質問を1つずつ） */
+.ez-steph { display: flex; align-items: center; gap: 12px; padding: calc(12px + env(safe-area-inset-top)) 16px 4px; max-width: 560px; margin: 0 auto; }
+.ez-back { display: inline-flex; align-items: center; gap: 4px; font-size: 17px; font-weight: 700; color: var(--ez-ink-2); min-height: 48px; padding: 0 14px 0 8px !important; border-radius: 999px !important; background: var(--ez-card) !important; box-shadow: 0 6px 16px -12px rgba(30, 42, 90, .6); }
+.ez-back svg { width: 22px; height: 22px; }
+.ez-prog { flex: 1; display: flex; gap: 6px; }
+.ez-prog i { flex: 1; height: 8px; border-radius: 99px; background: var(--ez-line); }
+.ez-prog i.on { background: var(--ez-fuji); }
+.ez-stepn { font-size: 14px; color: var(--ez-mute); white-space: nowrap; }
+
+/* 選ぶボタン */
+.ez-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ez-choices.one { grid-template-columns: 1fr; }
+.ez-choice { background: var(--ez-card); border-radius: 22px; padding: 14px; min-height: 96px; display: flex; align-items: center; gap: 12px; text-align: left;
+  box-shadow: 0 1px 0 var(--ez-line), 0 10px 20px -18px rgba(30, 42, 90, .55); border: 3px solid transparent !important; }
+.ez-choice.col { flex-direction: column; justify-content: center; text-align: center; gap: 6px; min-height: 128px; }
+.ez-choice.sel { border-color: var(--ez-fuji) !important; background: var(--ez-fuji-soft); }
+.ez-choice .art { width: 52px; height: 52px; flex: none; }
+.ez-choice.col .art { width: 58px; height: 58px; }
+.ez-choice b { font-size: 18px; line-height: 1.35; display: block; }
+.ez-choice span { font-size: 14px; color: var(--ez-mute); line-height: 1.4; display: block; }
+.ez-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.ez-chip { min-height: 56px; min-width: 76px; padding: 0 18px; border-radius: 999px; background: var(--ez-card); font-size: 19px; font-weight: 700;
+  box-shadow: 0 1px 0 var(--ez-line), 0 8px 16px -14px rgba(30, 42, 90, .6); border: 3px solid transparent !important; }
+.ez-chip.sel { border-color: var(--ez-fuji) !important; background: var(--ez-fuji-soft); color: var(--ez-fuji); }
+.ez-chip.ghost { background: transparent; box-shadow: none; border: 2px dashed var(--ez-line) !important; color: var(--ez-ink-2); }
+
+/* 石を選ぶ */
+.ez-search { display: flex; align-items: center; gap: 10px; background: var(--ez-card); border-radius: 999px; padding: 0 18px; min-height: 60px; margin-bottom: 14px; box-shadow: 0 1px 0 var(--ez-line); }
+.ez-search svg { width: 24px; height: 24px; color: var(--ez-mute); flex: none; }
+.ez-search input { border: 0; outline: 0; background: none; flex: 1; min-width: 0; font-size: 18px; padding: 14px 0; }
+.ez-stones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ez-stone { background: var(--ez-card); border-radius: 22px; padding: 14px 6px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  box-shadow: 0 1px 0 var(--ez-line), 0 10px 18px -16px rgba(30, 42, 90, .55); border: 3px solid transparent !important; min-height: 118px; }
+.ez-stone.sel { border-color: var(--ez-fuji) !important; background: var(--ez-fuji-soft); }
+.ez-stone svg { filter: drop-shadow(0 6px 6px rgba(30, 42, 90, .22)); }
+.ez-stone b { font-size: 15px; line-height: 1.3; text-align: center; word-break: keep-all; overflow-wrap: anywhere; }
+
+/* 金額・個数の入力 */
+.ez-display { background: var(--ez-card); border-radius: 26px; padding: 18px 20px; text-align: right; margin-bottom: 14px; box-shadow: 0 1px 0 var(--ez-line); }
+.ez-display .v { font-size: 46px; font-weight: 700; line-height: 1.2; min-height: 56px; word-break: break-all; }
+.ez-display .v small { font-size: 24px; margin-left: 6px; }
+.ez-display .v.zero { color: var(--ez-line); }
+.ez-display .s { font-size: 15px; color: var(--ez-mute); min-height: 22px; }
+.ez-keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ez-keys button { min-height: 68px; border-radius: 20px; background: var(--ez-card); font-size: 28px; font-weight: 700; box-shadow: 0 1px 0 var(--ez-line), 0 6px 12px -10px rgba(30, 42, 90, .5); }
+.ez-keys button:active { background: var(--ez-fuji-soft); }
+.ez-keys button.del { color: var(--ez-coral); font-size: 20px; }
+.ez-stepper { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 6px 0 16px; }
+.ez-stepper button { min-width: 72px; min-height: 64px; border-radius: 20px; background: var(--ez-card); font-size: 22px; font-weight: 700; box-shadow: 0 1px 0 var(--ez-line); }
+
+/* 確認 */
+.ez-confirm { background: var(--ez-card); border-radius: 28px; padding: 6px 20px; box-shadow: 0 1px 0 var(--ez-line), 0 18px 30px -24px rgba(30, 42, 90, .6); }
+.ez-confirm .r { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 0; }
+.ez-confirm .r + .r { border-top: 1px solid var(--ez-line); }
+.ez-confirm .r span { color: var(--ez-mute); font-size: 16px; flex: none; }
+.ez-confirm .r b { font-size: 19px; text-align: right; }
+.ez-confirm .r.total b { font-size: 30px; }
+.ez-confirm .r button { color: var(--ez-fuji); font-size: 15px; font-weight: 700; margin-left: 8px; white-space: nowrap; flex: none; min-height: 44px; }
+.ez-confirm .r b { flex: 1; min-width: 0; }
+
+/* 決める・進むボタン（画面の下に固定） */
+.ez-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 32; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(244, 245, 251, 0), var(--ez-bg) 30%); }
+.ez-cta .in { max-width: 560px; margin: 0 auto; display: flex; gap: 10px; }
+.ez-btn { flex: 1; min-height: 66px; border-radius: 999px; font-size: 21px !important; font-weight: 700; color: #fff !important; display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(160deg, #8273EA, #5A49CC) !important; box-shadow: 0 14px 24px -14px rgba(90, 73, 204, .95); }
+.ez-btn[disabled] { opacity: .35; box-shadow: none; }
+.ez-btn.sub { background: var(--ez-card) !important; color: var(--ez-ink) !important; box-shadow: 0 1px 0 var(--ez-line); flex: 0 0 auto; padding: 0 22px !important; }
+.ez-btn.jade { background: linear-gradient(160deg, #3DB58F, #23876A) !important; box-shadow: 0 14px 24px -14px rgba(35, 135, 106, .9); }
+
+/* 記録できた */
+.ez-done { text-align: center; padding: 40px 10px 10px; }
+.ez-done .ok { width: 112px; height: 112px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center; background: var(--ez-jade-soft); }
+.ez-done .ok svg { width: 64px; height: 64px; color: var(--ez-jade); }
+.ez-done .ok path { stroke-dasharray: 40; stroke-dashoffset: 40; animation: ezDraw .5s .1s ease-out forwards; }
+@keyframes ezDraw { to { stroke-dashoffset: 0; } }
+.ez-done h2 { font-size: 28px; margin: 0 0 8px; }
+.ez-done p { color: var(--ez-ink-2); margin: 0 0 4px; }
+
+/* 在庫 */
+.ez-stock { background: var(--ez-card); border-radius: 24px; margin-bottom: 12px; box-shadow: 0 1px 0 var(--ez-line), 0 12px 22px -20px rgba(30, 42, 90, .55); overflow: hidden; }
+.ez-stock > button { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px; text-align: left; min-height: 80px; }
+.ez-stock > button .tx { flex: 1; min-width: 0; }
+.ez-stock > button b { font-size: 19px; display: block; }
+.ez-stock > button span { font-size: 14px; color: var(--ez-mute); }
+.ez-stock > button .n { font-size: 24px; font-weight: 700; }
+.ez-stock > button .n small { font-size: 14px; color: var(--ez-mute); margin-left: 2px; }
+.ez-stock .sizes { border-top: 1px solid var(--ez-line); padding: 4px 12px 10px; }
+.ez-size { display: flex; align-items: center; gap: 8px; padding: 10px 4px; }
+.ez-size + .ez-size { border-top: 1px dashed var(--ez-line); }
+.ez-size .nm { flex: 1; min-width: 0; font-size: 17px; font-weight: 700; }
+.ez-size .nm span { display: block; font-size: 13px; color: var(--ez-mute); font-weight: 400; }
+.ez-size button { width: 52px; height: 52px; border-radius: 16px; background: var(--ez-bg); font-size: 26px; font-weight: 700; flex: none; }
+.ez-size input { width: 72px; height: 52px; border-radius: 14px; border: 2px solid var(--ez-line); text-align: center; font-size: 20px; font-weight: 700; background: #fff; }
+.ez-size.chg input { border-color: var(--ez-amber); background: var(--ez-amber-soft); }
+.ez-note { background: var(--ez-amber-soft); color: #7A4D07; border-radius: 18px; padding: 12px 16px; font-size: 15px; margin: 0 0 14px; }
+
+/* 売れ筋 */
+.ez-seg { display: grid; grid-template-columns: 1fr 1fr; background: #E8EAF4; border-radius: 999px; padding: 5px; margin: 8px 0 16px; }
+.ez-seg button { min-height: 50px; border-radius: 999px; font-size: 17px; font-weight: 700; color: var(--ez-ink-2); }
+.ez-seg button.on { background: var(--ez-card); color: var(--ez-ink); box-shadow: 0 4px 10px -6px rgba(30, 42, 90, .5); }
+.ez-rank { display: flex; align-items: center; gap: 14px; background: var(--ez-card); border-radius: 22px; padding: 14px 16px; margin-bottom: 10px; width: 100%; text-align: left;
+  box-shadow: 0 1px 0 var(--ez-line), 0 10px 18px -18px rgba(30, 42, 90, .6); }
+.ez-rank .no { width: 30px; font-size: 18px; font-weight: 700; color: var(--ez-mute); text-align: center; flex: none; }
+.ez-rank .no.g1 { color: #C08A12; } .ez-rank .no.g2 { color: #7C8496; } .ez-rank .no.g3 { color: #A8673A; }
+.ez-rank .tx { flex: 1; min-width: 0; }
+.ez-rank .tx b { font-size: 18px; display: block; }
+.ez-rank .bar { height: 8px; border-radius: 99px; background: var(--ez-bg); margin-top: 6px; overflow: hidden; }
+.ez-rank .bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #8273EA, #5A49CC); }
+.ez-rank .v { text-align: right; flex: none; }
+.ez-rank .v b { font-size: 18px; display: block; }
+.ez-rank .v span { font-size: 14px; color: var(--ez-mute); }
+
+/* 下から出る画面 */
+.ez-sheet { position: fixed; inset: 0; z-index: 40; background: rgba(30, 42, 90, .42); display: flex; align-items: flex-end; }
+.ez-sheet .pane { background: var(--ez-bg); width: 100%; max-height: 88vh; overflow-y: auto; border-radius: 30px 30px 0 0; padding: 10px 16px calc(20px + env(safe-area-inset-bottom)); animation: ezUp .22s ease-out; }
+.ez-sheet .grab { width: 48px; height: 6px; border-radius: 99px; background: #CFD3E4; margin: 0 auto 12px; }
+@keyframes ezUp { from { transform: translateY(40px); opacity: .4; } }
+.ez-sheet .pane > .ez-wrap { padding: 0; }
+
+.ez-load { padding: 60px 0; text-align: center; color: var(--ez-mute); }
+@media (prefers-reduced-motion: reduce) { .ez-done .ok path { animation: none; stroke-dashoffset: 0; } .ez-sheet .pane { animation: none; } .ez-tile { transition: none; } }
+@media (min-width: 600px) { .ez-stones { grid-template-columns: repeat(4, 1fr); } }
+
+.ez-cta.above { bottom: calc(76px + env(safe-area-inset-bottom)); padding-bottom: 10px; z-index: 33; }
+body.ez-on #toast { bottom: calc(118px + env(safe-area-inset-bottom)); z-index: 50; }
+.ez-sheet .pane { color: var(--ez-ink); }
+.ez-sheet .ez-row { min-height: 76px; }
+
 </style>
 </head>
 <body>
@@ -3262,5 +3480,585 @@ document.addEventListener('click', e => {
 })();
 </script>
 
+<script>
+/*
+ * easy.js — かんたん画面（スマホだけで、はじめての人でも使える画面）
+ * ・やりたいことを大きな絵のボタンで選び、質問に1つずつ答えるだけで記録できる
+ * ・石は1つずつ色の違う「玉」で表示する
+ * ・中身はいつもの帳簿と同じ（run() で同じ処理を呼ぶ）。「くわしい画面」にいつでも切り替えられる
+ */
+(function () {
+  'use strict';
+  const MODE_KEY = 'aoiro-mode';
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const H = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const Y = n => Math.round(Number(n) || 0).toLocaleString('ja-JP');
+  const pad = n => String(n).padStart(2, '0');
+  const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  const jpDate = s => { const [y, m, d] = String(s).split('-').map(Number); const w = '日月火水木金土'[new Date(y, m - 1, d).getDay()]; return `${m}月${d}日（${w}）`; };
+  const getMode = () => { try { return localStorage.getItem(MODE_KEY); } catch (e) { return null; } };
+  const setMode = m => { try { localStorage.setItem(MODE_KEY, m); } catch (e) { } };
+
+  /* ───────── 石の玉（色・模様） ───────── */
+  const STONE_LOOK = {
+    '翡翠': ['#C8F2DC', '#43B184', '#1C6A4B'], 'アメジスト': ['#EBDDFF', '#9C6BD9', '#4C2687'], 'ラピスラズリ': ['#9DB7FF', '#2B50BA', '#132661', 'speck'],
+    'タイガーアイ': ['#FFDC8F', '#C47A22', '#5A3310', 'band'], 'ローズクォーツ': ['#FFF2F6', '#F2A7BC', '#C46A88'], 'ヘマタイト': ['#EEF0F5', '#7D8494', '#272B34'],
+    'メノウ': ['#FFE3C6', '#E08B4B', '#883D16', 'band'], 'オニキス': ['#858999', '#272A35', '#07080C'], 'ルチルクォーツ': ['#FFFFFF', '#F1E8D1', '#B5A275', 'needle'],
+    '水晶': ['#FFFFFF', '#E7EEF8', '#A6B6CC', 'clear'], 'ヒマラヤ水晶': ['#FFFFFF', '#E9EFF6', '#A9B7C8', 'clear'], 'ソーダライト': ['#C3D0FF', '#3D5BC4', '#192A6E', 'band'],
+    'オーシャンジャスパー': ['#D9F1E3', '#6FAE8E', '#2F5A47', 'speck'], 'レッドジャスパー': ['#FFB9A3', '#B9462E', '#5E1C10'], 'ムーンストーン': ['#FFFFFF', '#E3E8F5', '#9EA9C9', 'clear'],
+    'ラブラドライト': ['#B7E0FF', '#4F6F86', '#1F2E3A', 'band'], 'アクアマリン': ['#E2FBFF', '#8ED6E6', '#3E8FA6'], 'シトリン': ['#FFF4C2', '#F2B53B', '#9A5D0E'],
+    'ガーネット': ['#FF9AA4', '#9B1B2E', '#430811'], 'アベンチュリン': ['#D2F4C9', '#56A64C', '#21541C', 'speck'], 'カーネリアン': ['#FFC9A0', '#E0662D', '#80290C'],
+    'ブラックトルマリン': ['#7E828F', '#24262E', '#050608'], 'スモーキークォーツ': ['#F2E3D2', '#A58467', '#4B3523', 'clear'], 'ターコイズ': ['#CFF8F2', '#3EBDB0', '#1A6C66', 'speck'],
+    '琥珀': ['#FFE2A6', '#E1962A', '#7A430B'], 'パール': ['#FFFFFF', '#F3EEE6', '#C8BEB0'], 'マラカイト': ['#C9F5DA', '#1F9A5F', '#0B4A2B', 'band'],
+    'ペリドット': ['#F1FFC4', '#A6C83B', '#566B12'], 'フローライト': ['#E6DFFF', '#8A7FD9', '#3E6E8C', 'band'], 'ラリマー': ['#E6FBFF', '#7CCBE6', '#2E7FA1', 'speck']
+  };
+  let gid = 0;
+  function lookOf(name) {
+    const n = String(name || '').normalize('NFKC');
+    if (STONE_LOOK[n]) return STONE_LOOK[n];
+    const k = Object.keys(STONE_LOOK).find(x => n.includes(x));
+    if (k) return STONE_LOOK[k];
+    let h = 0; for (const c of n) h = (h * 31 + c.charCodeAt(0)) % 360;
+    return [`hsl(${h} 80% 88%)`, `hsl(${h} 45% 55%)`, `hsl(${h} 50% 25%)`];
+  }
+  /** 石の玉（SVG） */
+  function gem(name, px) {
+    const [c1, c2, c3, kind] = lookOf(name), id = 'eg' + (++gid);
+    let over = '';
+    if (kind === 'band') over = `<g clip-path="url(#${id}c)" fill="none" stroke="${c1}" stroke-opacity=".45" stroke-width="2.4"><path d="M-4 18 Q20 8 44 20"/><path d="M-4 26 Q20 16 44 28"/><path d="M-4 33 Q20 25 44 36"/></g>`;
+    if (kind === 'speck') over = `<g fill="#F4D27A" opacity=".85"><circle cx="13" cy="24" r="1.1"/><circle cx="25" cy="15" r=".9"/><circle cx="27" cy="27" r="1.2"/><circle cx="18" cy="31" r=".8"/><circle cx="30" cy="21" r=".7"/></g>`;
+    if (kind === 'needle') over = `<g clip-path="url(#${id}c)" stroke="#D6A52E" stroke-width=".9" opacity=".9"><path d="M8 30 L30 10"/><path d="M12 34 L33 18"/><path d="M14 12 L24 32"/></g>`;
+    if (kind === 'clear') over = `<circle cx="20" cy="20" r="12.5" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="1.4"/>`;
+    return `<svg width="${px}" height="${px}" viewBox="0 0 40 40" aria-hidden="true"><defs>
+      <radialGradient id="${id}" cx="36%" cy="30%" r="72%"><stop offset="0" stop-color="${c1}"/><stop offset=".55" stop-color="${c2}"/><stop offset="1" stop-color="${c3}"/></radialGradient>
+      <clipPath id="${id}c"><circle cx="20" cy="20" r="17"/></clipPath></defs>
+      <circle cx="20" cy="20" r="17" fill="url(#${id})"/>${over}
+      <ellipse cx="14" cy="12.5" rx="5.2" ry="3.2" fill="#fff" opacity=".75" transform="rotate(-28 14 12.5)"/>
+      <circle cx="27" cy="29" r="1.6" fill="#fff" opacity=".35"/></svg>`;
+  }
+  /** 勾玉の形（石の色） */
+  function magatama(name, px) {
+    const [c1, c2, c3] = lookOf(name), id = 'em' + (++gid);
+    return `<svg width="${px}" height="${px}" viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="${id}" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="${c1}"/><stop offset=".55" stop-color="${c2}"/><stop offset="1" stop-color="${c3}"/></radialGradient></defs>
+      <path d="M22 4c8 0 14 6 14 13.5S30 31 22 31c-2.5 0-4.6 1.4-5.6 3.6C15.6 36.6 13.6 37 12 36c-4-2.6-6-7.4-6-12.5C6 12 12.8 4 22 4z" fill="url(#${id})"/>
+      <circle cx="23" cy="15" r="3.6" fill="${c3}" opacity=".55"/><ellipse cx="17" cy="11" rx="4" ry="2.4" fill="#fff" opacity=".7" transform="rotate(-30 17 11)"/></svg>`;
+  }
+  const SHAPES = [
+    { k: '勾玉', d: '曲がった形', art: n => magatama(n, 54) },
+    { k: '丸玉', d: '丸いビーズ', art: n => gem(n, 50) },
+    { k: 'ポイント', d: 'とがった柱の形', art: n => { const [c1, c2, c3] = lookOf(n); return `<svg width="54" height="54" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l7 9v22l-7 4-7-4V12z" fill="${c2}"/><path d="M20 3l7 9-7 3-7-3z" fill="${c1}"/><path d="M20 15v23l7-4V12z" fill="${c3}" opacity=".6"/></svg>`; } },
+    { k: 'さざれ', d: '小さなかけら', art: n => { const [c1, c2, c3] = lookOf(n); return `<svg width="54" height="54" viewBox="0 0 40 40" aria-hidden="true"><path d="M6 24l6-6 7 3-2 8-8 1z" fill="${c2}"/><path d="M19 14l8-4 5 6-4 6-8-1z" fill="${c1}" stroke="${c3}" stroke-opacity=".3"/><path d="M20 27l7-3 6 5-4 6-8-2z" fill="${c3}" opacity=".8"/></svg>`; } },
+    { k: '原石', d: '加工前の石', art: n => { const [c1, c2, c3] = lookOf(n); return `<svg width="54" height="54" viewBox="0 0 40 40" aria-hidden="true"><path d="M5 26l7-14 12-5 11 10-3 15-14 4z" fill="${c2}"/><path d="M12 12l12-5 4 12-11 4z" fill="${c1}" opacity=".8"/><path d="M17 23l11-4 7-2-3 15-14 4z" fill="${c3}" opacity=".55"/></svg>`; } },
+    { k: 'その他', d: '上にない形', art: () => `<svg width="54" height="54" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="#ECE9FC"/><path d="M14 20h12M20 14v12" stroke="#6B5BD6" stroke-width="3" stroke-linecap="round"/></svg>` }
+  ];
+
+  /* ───────── 絵（タイル用） ───────── */
+  const ART = {
+    pay: `<svg viewBox="0 0 80 80" aria-hidden="true"><defs><linearGradient id="ezW1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8E7BF0"/><stop offset="1" stop-color="#5644C6"/></linearGradient><linearGradient id="ezC1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE08A"/><stop offset="1" stop-color="#E2A022"/></linearGradient></defs>
+      <rect x="8" y="22" width="56" height="40" rx="12" fill="url(#ezW1)"/><rect x="8" y="22" width="56" height="12" rx="6" fill="#fff" opacity=".18"/><rect x="44" y="36" width="24" height="16" rx="8" fill="#3E2FA6"/><circle cx="54" cy="44" r="3.6" fill="#FFE08A"/>
+      <ellipse cx="62" cy="66" rx="13" ry="4.5" fill="#C78A12"/><rect x="49" y="57" width="26" height="9" rx="4.5" fill="url(#ezC1)"/><ellipse cx="62" cy="57" rx="13" ry="4.5" fill="#FFE9A8"/><text x="62" y="60" text-anchor="middle" font-size="7" font-weight="700" fill="#B07A0C">¥</text></svg>`,
+    buy: () => `<svg viewBox="0 0 80 80" aria-hidden="true"><defs><linearGradient id="ezB1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7D9A8"/><stop offset="1" stop-color="#C98F4A"/></linearGradient></defs>
+      <path d="M18 34c0-6 6-8 22-8s22 2 22 8l4 26c1 8-6 12-26 12S13 68 14 60z" fill="url(#ezB1)"/><path d="M24 30c4-4 28-4 32 0" stroke="#8A5A22" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <g transform="translate(22 6)">${gem('アメジスト', 22).replace(/^<svg/, '<svg x="0" y="10"')}</g><g transform="translate(36 2)">${gem('翡翠', 24).replace(/^<svg/, '<svg x="0" y="8"')}</g><g transform="translate(46 12)">${gem('ローズクォーツ', 20).replace(/^<svg/, '<svg x="0" y="6"')}</g>
+      <circle cx="58" cy="58" r="13" fill="#6B5BD6"/><path d="M58 52v12M52 58h12" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/></svg>`,
+    stock: () => `<svg viewBox="0 0 80 80" aria-hidden="true"><defs><linearGradient id="ezS1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9E4CF"/><stop offset="1" stop-color="#2E9E7B"/></linearGradient></defs>
+      <path d="M10 38h60l-6 30H16z" fill="url(#ezS1)"/><path d="M10 38h60" stroke="#1F7A5E" stroke-width="3" stroke-linecap="round"/>
+      ${[['タイガーアイ', 14, 20], ['ラピスラズリ', 28, 14], ['水晶', 42, 18], ['ヘマタイト', 54, 22]].map(([n, x, y]) => gem(n, 18).replace(/^<svg/, `<svg x="${x}" y="${y}"`)).join('')}
+      <rect x="28" y="48" width="24" height="10" rx="5" fill="#fff" opacity=".85"/><path d="M33 53h14" stroke="#2E9E7B" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+    best: () => `<svg viewBox="0 0 80 80" aria-hidden="true"><defs><linearGradient id="ezT1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD98C"/><stop offset="1" stop-color="#E3A13B"/></linearGradient></defs>
+      <rect x="8" y="50" width="20" height="20" rx="5" fill="#D9DCEA"/><rect x="30" y="38" width="20" height="32" rx="5" fill="url(#ezT1)"/><rect x="52" y="56" width="20" height="14" rx="5" fill="#E9C7A8"/>
+      ${gem('アメジスト', 16).replace(/^<svg/, '<svg x="10" y="33"')}${gem('翡翠', 20).replace(/^<svg/, '<svg x="30" y="17"')}${gem('タイガーアイ', 16).replace(/^<svg/, '<svg x="54" y="39"')}
+      <text x="40" y="60" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">1</text></svg>`,
+    import: `<svg viewBox="0 0 80 80" aria-hidden="true"><rect x="22" y="8" width="36" height="64" rx="9" fill="#24316A"/><rect x="26" y="15" width="28" height="46" rx="4" fill="#ECE9FC"/>
+      <path d="M40 22v22M32 36l8 8 8-8" stroke="#6B5BD6" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="31" y="50" width="18" height="5" rx="2.5" fill="#B8B0F2"/><circle cx="40" cy="66" r="2" fill="#8D95BE"/></svg>`
+  };
+  const IC = {
+    home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>',
+    box: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+    trend: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M6 15l4-4 3 3 5-6"/><path d="M14 8h4v4"/></svg>',
+    menu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+    back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    help: '<svg viewBox="0 0 24 24" fill="none" stroke="#6B5BD6" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.6v.4"/><circle cx="12" cy="17" r=".6" fill="#6B5BD6"/></svg>'
+  };
+
+  /* 支払いの種類（勘定科目は自動で決まる） */
+  const PAY_KINDS = [
+    { acc: '501', t: '石・パーツの仕入れ', d: '売るための石やひも', art: () => gem('アメジスト', 50) },
+    { acc: '602', t: '送料・梱包', d: '発送の送料、袋や箱', art: () => `<svg viewBox="0 0 40 40" width="50" height="50" aria-hidden="true"><path d="M6 13l14-7 14 7v15l-14 7-14-7z" fill="#E9C7A8"/><path d="M6 13l14 7 14-7" fill="none" stroke="#B8875A" stroke-width="2"/><path d="M20 20v15" stroke="#B8875A" stroke-width="2"/><path d="M13 9.5l14 7" stroke="#fff" stroke-width="3" opacity=".7"/></svg>` },
+    { acc: '620', t: '販売の手数料', d: 'お店やサイトの手数料', art: () => `<svg viewBox="0 0 40 40" width="50" height="50" aria-hidden="true"><rect x="5" y="9" width="30" height="22" rx="5" fill="#8273EA"/><rect x="5" y="14" width="30" height="5" fill="#3E2FA6"/><rect x="9" y="23" width="10" height="3" rx="1.5" fill="#fff" opacity=".8"/></svg>` },
+    { acc: '604', t: '電車・ガソリン', d: '仕入れや発送の移動', art: () => `<svg viewBox="0 0 40 40" width="50" height="50" aria-hidden="true"><rect x="7" y="6" width="26" height="24" rx="7" fill="#2E9E7B"/><rect x="11" y="10" width="18" height="9" rx="2" fill="#E3F4EE"/><circle cx="13" cy="24" r="2" fill="#fff"/><circle cx="27" cy="24" r="2" fill="#fff"/><path d="M11 34l3-4M29 34l-3-4" stroke="#1F7A5E" stroke-width="2.4" stroke-linecap="round"/></svg>` },
+    { acc: '610', t: '道具・文房具', d: '1つ10万円未満の物', art: () => `<svg viewBox="0 0 40 40" width="50" height="50" aria-hidden="true"><rect x="8" y="5" width="9" height="30" rx="4.5" fill="#E3A13B" transform="rotate(-20 12 20)"/><path d="M20 30l12-20 3 2-12 20z" fill="#6B5BD6"/><circle cx="26" cy="32" r="4" fill="#D9534F"/></svg>` },
+    { acc: '605', t: '電話・ネット', d: '携帯代・ネット代', art: () => `<svg viewBox="0 0 40 40" width="50" height="50" aria-hidden="true"><rect x="12" y="4" width="16" height="32" rx="4" fill="#24316A"/><rect x="14.5" y="8" width="11" height="22" rx="1.5" fill="#B8E3FF"/><circle cx="20" cy="33" r="1.4" fill="#fff"/></svg>` },
+    { acc: '606', t: '広告・チラシ', d: '名刺・チラシ・広告', art: () => `<svg viewBox="0 0 40 40" width="50" height="50" aria-hidden="true"><path d="M7 16h6l14-8v24l-14-8H7z" fill="#D9534F"/><rect x="11" y="24" width="5" height="9" rx="2" fill="#A83A36"/><path d="M31 15c2 2 2 8 0 10" stroke="#E3A13B" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>` },
+    { acc: '', t: 'そのほか', d: '一覧から選ぶ', art: () => `<svg viewBox="0 0 40 40" width="50" height="50" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="#ECE9FC"/><circle cx="13" cy="20" r="2.4" fill="#6B5BD6"/><circle cx="20" cy="20" r="2.4" fill="#6B5BD6"/><circle cx="27" cy="20" r="2.4" fill="#6B5BD6"/></svg>` }
+  ];
+  const PAY_FROM = [
+    { acc: '101', t: 'お店のお金（現金）', d: 'レジや事業用の財布から', art: `<svg viewBox="0 0 40 40" width="48" height="48" aria-hidden="true"><rect x="4" y="11" width="32" height="20" rx="4" fill="#3DB58F"/><circle cx="20" cy="21" r="5" fill="#E3F4EE"/><text x="20" y="24.5" text-anchor="middle" font-size="8" font-weight="700" fill="#23876A">¥</text></svg>` },
+    { acc: '290', t: '自分のお財布', d: '個人のお金で立て替えた', art: `<svg viewBox="0 0 40 40" width="48" height="48" aria-hidden="true"><path d="M8 16c0-3 2-5 5-5h16c3 0 5 2 5 5v12c0 3-2 5-5 5H13c-3 0-5-2-5-5z" fill="#C98F4A"/><path d="M8 18h26" stroke="#8A5A22" stroke-width="2"/><rect x="24" y="20" width="12" height="8" rx="4" fill="#8A5A22"/><circle cx="29" cy="24" r="1.8" fill="#FFE08A"/></svg>` },
+    { acc: '202', t: 'クレジットカード', d: 'あとで引き落とされる', art: `<svg viewBox="0 0 40 40" width="48" height="48" aria-hidden="true"><rect x="4" y="9" width="32" height="22" rx="4" fill="#6B5BD6"/><rect x="4" y="14" width="32" height="5" fill="#3E2FA6"/><rect x="8" y="23" width="9" height="4" rx="1.5" fill="#FFE08A"/></svg>` },
+    { acc: '102', t: '銀行から', d: '振込・引き落とし', art: `<svg viewBox="0 0 40 40" width="48" height="48" aria-hidden="true"><path d="M5 15L20 6l15 9z" fill="#24316A"/><rect x="8" y="16" width="4" height="13" fill="#7B82A0"/><rect x="18" y="16" width="4" height="13" fill="#7B82A0"/><rect x="28" y="16" width="4" height="13" fill="#7B82A0"/><rect x="5" y="30" width="30" height="4" rx="1" fill="#24316A"/></svg>` }
+  ];
+  const ACC_ICON = { '501': () => gem('アメジスト', 30), '401': () => gem('翡翠', 30) };
+
+  /* ───────── 画面の土台 ───────── */
+  const E = { view: 'home', data: {}, flow: null };
+  let root;
+  function mount() {
+    if (root) return;
+    root = document.createElement('div');
+    root.id = 'easy';
+    document.body.appendChild(root);
+    const nav = document.createElement('nav');
+    nav.id = 'ezNav'; nav.setAttribute('aria-label', 'かんたん画面のメニュー');
+    nav.innerHTML = [['home', 'ホーム', IC.home], ['stock', '在庫', IC.box], ['add', '記録する', IC.plus], ['best', '売れた石', IC.trend], ['more', 'そのほか', IC.menu]]
+      .map(([k, l, i]) => k === 'add' ? `<button data-k="add" class="plus"><i>${i}</i>${l}</button>` : `<button data-k="${k}">${i}${l}</button>`).join('');
+    document.body.appendChild(nav);
+    nav.onclick = e => { const b = e.target.closest('button'); if (!b) return; const k = b.dataset.k; if (k === 'add') return addSheet(); if (k === 'more') return moreSheet(); show(k); };
+    if (!document.getElementById('ezFont')) {
+      const l = document.createElement('link'); l.id = 'ezFont'; l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap';
+      document.head.appendChild(l);
+    }
+  }
+  function enter() { mount(); document.body.classList.add('ez-on'); root.hidden = false; $('#ezNav').hidden = false; setMode('easy'); show('home'); }
+  function leave() {
+    setMode('full'); document.body.classList.remove('ez-on');
+    if (root) { root.hidden = true; $('#ezNav').hidden = true; }
+    closeSheet(); E.flow = null; ctaOff();
+    if (window.go) window.go('home');
+  }
+  function navOn(k) { $$('#ezNav button').forEach(b => b.classList.toggle('on', b.dataset.k === k)); $('#ezNav').hidden = false; }
+  function ctaOff() { const c = $('#ezCta'); if (c) c.remove(); }
+  function cta(html, above) {
+    ctaOff();
+    const c = document.createElement('div'); c.id = 'ezCta'; c.className = 'ez-cta' + (above ? ' above' : ''); c.innerHTML = `<div class="in">${html}</div>`;
+    document.body.appendChild(c); return c;
+  }
+  async function show(view) {
+    E.view = view; E.flow = null; ctaOff(); closeSheet(); navOn(view); root.style.paddingBottom = '';
+    root.innerHTML = '<div class="ez-load">読み込んでいます…</div>';
+    root.scrollTop = 0;
+    try { await VIEWS[view](); } catch (e) { root.innerHTML = `<div class="ez-wrap"><div class="ez-empty">うまく表示できませんでした。<br>${H(e.message || e)}</div></div>`; }
+  }
+  const call = (m, p) => run(m, p || {}, { quiet: true });
+  const year = () => (typeof S !== 'undefined' && S.year) || new Date().getFullYear();
+
+  /* ───────── ホーム ───────── */
+  const VIEWS = {};
+  VIEWS.home = async () => {
+    const now = new Date(), y = year(), m = now.getMonth() + 1;
+    const [dash, st] = await Promise.all([call('dashboard', { year: y }), call('salesStats', { year: y })]);
+    const months = st.months || [];
+    const cur = (months[m - 1] || {}).price || 0, prev = (months[m - 2] || {}).price || 0;
+    const diff = cur - prev;
+    const curRows = (st.list || []).filter(r => Number(String(r.date).slice(5, 7)) === m);
+    const beads = curRows.slice(0, 28).map(r => gem(r.stone, Math.max(22, Math.min(40, 18 + (Number(r.price) || 0) / 250)))).join('');
+    const hour = now.getHours();
+    const hello = hour < 11 ? 'おはようございます' : hour < 18 ? 'こんにちは' : 'こんばんは';
+    const recent = dash.recent || [];
+    root.innerHTML = `
+      <div class="ez-top"><div class="ez-hello"><b>${hello}</b><span>${now.getMonth() + 1}月${now.getDate()}日（${'日月火水木金土'[now.getDay()]}）</span></div>
+        <button class="ez-round" id="ezHelp" aria-label="使い方">${IC.help}</button></div>
+      <div class="ez-wrap">
+        <section class="ez-tray" aria-label="${m}月の売上">
+          <div class="lbl">${m}月に売れた金額</div>
+          <div class="big">${Y(cur)}<small>円</small></div>
+          ${prev || cur ? `<span class="cmp ${diff >= 0 ? 'up' : 'down'}">先月より ${diff >= 0 ? '＋' : '−'}${Y(Math.abs(diff))}円</span>` : ''}
+          <div class="ez-beads" aria-label="${m}月に売れた石 ${curRows.length}個">${beads || '<span class="none">今月売れた石が、ここに玉で並びます</span>'}</div>
+          <div class="sub"><span>今月売れた数 <b>${curRows.length}</b>個</span><span>${y}年の合計 <b>${Y(st.total ? st.total.price : 0)}</b>円</span></div>
+        </section>
+        <h2 class="ez-h">なにをしますか？</h2>
+        <div class="ez-tiles">
+          <button class="ez-tile" data-ez="pay"><div class="art">${ART.pay}</div><b>お金を払った</b><span>送料や道具など</span></button>
+          <button class="ez-tile" data-ez="buy"><div class="art">${ART.buy()}</div><b>石を仕入れた</b><span>買った石を記録</span></button>
+          <button class="ez-tile" data-ez="stock"><div class="art">${ART.stock()}</div><b>在庫を見る</b><span>数を直すのもここ</span></button>
+          <button class="ez-tile" data-ez="best"><div class="art">${ART.best()}</div><b>売れた石を見る</b><span>どの石が人気か</span></button>
+        </div>
+        <h2 class="ez-h">最近の記録</h2>
+        <div class="ez-list">${recent.length ? recent.slice(0, 5).map(recRow).join('') : '<div class="ez-empty">まだ記録がありません。<br>上のボタンから始めましょう。</div>'}</div>
+      </div>`;
+    $$('[data-ez]', root).forEach(b => b.onclick = () => { const g = b.dataset.ez; if (g === 'pay') payFlow(); else if (g === 'buy') buyFlow(); else show(g); });
+    $('#ezHelp').onclick = helpSheet;
+  };
+  function recRow(e) {
+    const dr = (e.lines || []).filter(l => Number(l.debit) > 0), cr = (e.lines || []).filter(l => Number(l.credit) > 0);
+    const amt = dr.reduce((s, l) => s + Number(l.debit), 0);
+    const sale = cr.some(l => l.account === '401');
+    const acc = sale ? '401' : (dr[0] || {}).account;
+    const k = PAY_KINDS.find(p => p.acc === acc);
+    const ic = (acc === '102' || acc === '101') ? PAY_FROM.find(p => p.acc === acc).art.replace(/width="48" height="48"/, 'width="30" height="30"') : ACC_ICON[acc] ? ACC_ICON[acc]() : k ? k.art().replace(/width="50" height="50"/, 'width="30" height="30"') : IC.box;
+    const title = String(e.memo || e.partner || '記録').replace(/^販売:\s*/, '売れた：').replace(/^売上金の入金:.*/, '売上金が振り込まれた').replace(/^売上金のチャージ:.*/, '売上金をチャージした').replace(/^石の仕入:\s*/, '石を仕入れた：').slice(0, 40);
+    return `<div class="ez-row"><div class="ic">${ic}</div><div class="tx"><b>${H(title)}</b><span>${jpDate(e.date)}</span></div>
+      <div class="amt ${sale ? 'in' : ''}">${sale ? '＋' : ''}${Y(sale ? cr.filter(l => l.account === '401').reduce((s, l) => s + Number(l.credit), 0) : amt)}円</div></div>`;
+  }
+
+  /* ───────── 質問を1つずつ進める仕組み ───────── */
+  function flow(steps, state, onDone) {
+    E.flow = { steps, state, i: 0, onDone };
+    navOn(''); $('#ezNav').hidden = true;
+    step(0);
+  }
+  function step(i) {
+    const f = E.flow; if (!f) return;
+    f.i = i;
+    const s = f.steps[i];
+    ctaOff();
+    root.scrollTop = 0;
+    root.innerHTML = `<div class="ez-steph"><button class="ez-back" id="ezBack">${IC.back}${i ? 'もどる' : 'やめる'}</button>
+        <div class="ez-prog" aria-hidden="true">${f.steps.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div><span class="ez-stepn">${i + 1} / ${f.steps.length}</span></div>
+      <div class="ez-wrap" style="padding-bottom:110px"><h1 class="ez-q">${s.q(f.state)}</h1>${s.hint ? `<p class="ez-hint">${s.hint(f.state)}</p>` : ''}<div id="ezBody"></div></div>`;
+    $('#ezBack').onclick = () => (i ? step(i - 1) : show('home'));
+    const next = () => (i + 1 < f.steps.length ? step(i + 1) : f.onDone(f.state));
+    s.render($('#ezBody'), f.state, next);
+  }
+  /** 選ぶ（押したら次へ） */
+  function choices(body, items, cur, onPick, opt = {}) {
+    body.innerHTML = `<div class="ez-choices ${opt.one ? 'one' : ''}">${items.map((it, k) => `<button class="ez-choice ${opt.col ? 'col' : ''} ${cur === it.v ? 'sel' : ''}" data-i="${k}">
+      ${it.art ? `<div class="art">${it.art}</div>` : ''}<div><b>${H(it.t)}</b>${it.d ? `<span>${H(it.d)}</span>` : ''}</div></button>`).join('')}</div>`;
+    $$('.ez-choice', body).forEach(b => b.onclick = () => { $$('.ez-choice', body).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); setTimeout(() => onPick(items[Number(b.dataset.i)]), 140); });
+  }
+  /** 数字の入力（大きなボタン） */
+  function keypad(body, init, opt, onOk) {
+    let v = String(init || '');
+    body.innerHTML = `<div class="ez-display"><div class="v" id="ezV"></div><div class="s" id="ezS"></div></div>
+      ${opt.stepper ? `<div class="ez-stepper"><button data-a="-10">−10</button><button data-a="-1">−1</button><button data-a="1">＋1</button><button data-a="10">＋10</button></div>` : ''}
+      <div class="ez-keys">${['1', '2', '3', '4', '5', '6', '7', '8', '9', opt.stepper ? 'C' : '00', '0', 'del'].map(k => `<button data-k="${k}" ${k === 'del' ? 'class="del" aria-label="1文字消す"' : ''}>${k === 'del' ? '消す' : k === 'C' ? '0に' : k}</button>`).join('')}</div>`;
+    const c = cta(`<button class="ez-btn" id="ezOk">次へ</button>`);
+    const draw = () => {
+      const n = Number(v || 0);
+      $('#ezV', body).innerHTML = v ? `${Y(n)}<small>${opt.unit}</small>` : `0<small>${opt.unit}</small>`;
+      $('#ezV', body).classList.toggle('zero', !v);
+      $('#ezS', body).textContent = opt.sub ? opt.sub(n) : '';
+      $('#ezOk', c).disabled = !(n > 0);
+    };
+    $$('.ez-keys button', body).forEach(b => b.onclick = () => {
+      const k = b.dataset.k;
+      if (k === 'del') v = v.slice(0, -1); else if (k === 'C') v = ''; else if (v.length < 9) v = (v === '0' ? '' : v) + k;
+      v = v.replace(/^0+/, ''); draw();
+    });
+    $$('.ez-stepper button', body).forEach(b => b.onclick = () => { v = String(Math.max(0, Number(v || 0) + Number(b.dataset.a))); if (v === '0') v = ''; draw(); });
+    $('#ezOk', c).onclick = () => onOk(Number(v || 0));
+    draw();
+  }
+  function dateStep(state, key = 'date') {
+    return {
+      q: () => 'いつですか？',
+      render(body, st, next) {
+        const t = new Date(), y = new Date(Date.now() - 864e5);
+        body.innerHTML = `<div class="ez-choices one">
+          <button class="ez-choice ${st[key] === ymd(t) ? 'sel' : ''}" data-d="${ymd(t)}"><div><b>今日</b><span>${jpDate(ymd(t))}</span></div></button>
+          <button class="ez-choice ${st[key] === ymd(y) ? 'sel' : ''}" data-d="${ymd(y)}"><div><b>きのう</b><span>${jpDate(ymd(y))}</span></div></button>
+          <label class="ez-choice" style="cursor:pointer"><div style="flex:1"><b>日にちを選ぶ</b><span id="ezPick">${st[key] && st[key] !== ymd(t) && st[key] !== ymd(y) ? jpDate(st[key]) : 'カレンダーから選べます'}</span></div>
+            <input type="date" id="ezDate" value="${st[key] || ymd(t)}" max="${ymd(t)}" style="width:150px;min-height:48px;border:2px solid #E3E5F0;border-radius:14px;padding:0 8px;background:#fff"></label></div>`;
+        $$('[data-d]', body).forEach(b => b.onclick = () => { st[key] = b.dataset.d; next(); });
+        $('#ezDate', body).onchange = e => { if (e.target.value) { st[key] = e.target.value; next(); } };
+      }
+    };
+  }
+
+  /* ───────── お金を払った ───────── */
+  function payFlow() {
+    const accs = ((typeof S !== 'undefined' && S.boot && S.boot.accounts) || []).filter(a => a.active && (a.type === '費用' || a.code === '501'));
+    flow([
+      {
+        q: () => '何にお金を使いましたか？', hint: () => 'いちばん近いものを押してください。',
+        render(body, st, next) {
+          choices(body, PAY_KINDS.map(k => ({ v: k.acc, t: k.t, d: k.d, art: k.art() })), st.acc, it => {
+            if (it.v) { st.acc = it.v; st.kind = it.t; return next(); }
+            body.innerHTML = `<div class="ez-list">${accs.map(a => `<button class="ez-row" data-a="${a.code}"><div class="tx"><b>${H(a.name)}</b></div><span class="chev">›</span></button>`).join('')}</div>`;
+            $$('[data-a]', body).forEach(b => b.onclick = () => { st.acc = b.dataset.a; st.kind = accs.find(a => a.code === st.acc).name; next(); });
+          }, { col: true });
+        }
+      },
+      { q: st => `${H(st.kind)}に、いくら払いましたか？`, hint: () => 'レシートの合計の金額を押してください。', render(body, st, next) { keypad(body, st.amount, { unit: '円' }, n => { st.amount = n; next(); }); } },
+      {
+        q: () => 'どのお金で払いましたか？',
+        render(body, st, next) { choices(body, PAY_FROM.map(p => ({ v: p.acc, t: p.t, d: p.d, art: p.art })), st.from, it => { st.from = it.v; st.fromName = it.t; next(); }, { one: true }); }
+      },
+      dateStep(),
+      {
+        q: () => 'これで記録しますか？', hint: () => 'まちがいがあれば「直す」を押してください。',
+        render(body, st) {
+          body.innerHTML = `<div class="ez-confirm">
+            <div class="r total"><span>金額</span><b>${Y(st.amount)}円</b><button data-s="1">直す</button></div>
+            <div class="r"><span>使いみち</span><b>${H(st.kind)}</b><button data-s="0">直す</button></div>
+            <div class="r"><span>払ったお金</span><b>${H(st.fromName)}</b><button data-s="2">直す</button></div>
+            <div class="r"><span>日にち</span><b>${jpDate(st.date)}</b><button data-s="3">直す</button></div>
+            <label class="r" style="display:block"><span style="display:block;margin-bottom:6px">どこで？（書かなくても大丈夫）</span>
+              <input id="ezMemo" value="${H(st.memo || '')}" placeholder="例：郵便局、ダイソー" style="width:100%;min-height:54px;border:2px solid #E3E5F0;border-radius:16px;padding:0 14px;font-size:18px"></label></div>`;
+          $$('[data-s]', body).forEach(b => b.onclick = () => step(Number(b.dataset.s)));
+          const c = cta(`<button class="ez-btn jade" id="ezSave">${IC.check.replace('<svg', '<svg width="26" height="26"')}記録する</button>`);
+          $('#ezSave', c).onclick = async () => {
+            st.memo = $('#ezMemo').value.trim();
+            $('#ezSave', c).disabled = true;
+            try {
+              await call('addEntry', { date: st.date, debit: st.acc, credit: st.from, amount: st.amount, ratio: 100, memo: [st.kind, st.memo].filter(Boolean).join('：'), partner: st.memo });
+              done(`${Y(st.amount)}円を記録しました`, `${jpDate(st.date)}・${st.kind}`, payFlow);
+            } catch (e) { $('#ezSave', c).disabled = false; toast(e.message || String(e), true); }
+          };
+        }
+      }
+    ], { date: ymd(new Date()) });
+  }
+
+  /* ───────── 石を仕入れた ───────── */
+  async function stoneNames() {
+    const [dict, st, dates] = await Promise.all([call('stoneDict'), call('salesStats', { year: year() }), call('inventoryDates')]);
+    const count = {};
+    (st.byStone || []).forEach(s => { count[s.name] = (count[s.name] || 0) + s.count * 3; });
+    if (dates[0]) { const inv = await call('inventory', { date: dates[0].date }); inv.rows.forEach(r => { count[r.item] = (count[r.item] || 0) + 1; }); }
+    (dict.names || []).forEach(n => { count[n] = count[n] || 0; });
+    delete count['その他']; delete count[''];
+    return Object.keys(count).sort((a, b) => count[b] - count[a]);
+  }
+  async function buyFlow() {
+    root.innerHTML = '<div class="ez-load">読み込んでいます…</div>';
+    const names = await stoneNames();
+    flow([
+      {
+        q: () => 'どの石を仕入れましたか？', hint: () => 'よく使う石が上に並んでいます。',
+        render(body, st, next) {
+          body.innerHTML = `<label class="ez-search">${IC.search}<input id="ezQ" placeholder="石の名前でさがす" autocomplete="off"></label><div class="ez-stones" id="ezStones"></div>`;
+          const draw = q => {
+            const qq = q.normalize('NFKC').trim();
+            let list = names.filter(n => !qq || n.includes(qq));
+            const extra = qq && !names.includes(qq) ? `<button class="ez-stone" data-n="${H(qq)}">${gem(qq, 50)}<b>「${H(qq)}」で記録</b></button>` : '';
+            $('#ezStones', body).innerHTML = extra + list.slice(0, 30).map(n => `<button class="ez-stone ${st.stone === n ? 'sel' : ''}" data-n="${H(n)}">${gem(n, 50)}<b>${H(n)}</b></button>`).join('');
+            $$('[data-n]', body).forEach(b => b.onclick = () => { st.stone = b.dataset.n; b.classList.add('sel'); setTimeout(next, 140); });
+          };
+          $('#ezQ', body).oninput = e => draw(e.target.value);
+          draw('');
+        }
+      },
+      {
+        q: st => `${H(st.stone)}の、どんな形ですか？`,
+        render(body, st, next) { choices(body, SHAPES.map(s => ({ v: s.k, t: s.k, d: s.d, art: s.art(st.stone) })), st.shape, it => { st.shape = it.v; next(); }, { col: true }); }
+      },
+      {
+        q: () => '大きさは何ミリですか？', hint: () => 'わからなければ「わからない」を押してください。',
+        render(body, st, next) {
+          const sizes = st.shape === '勾玉' ? [15, 18, 20, 22, 25, 30, 35, 40, 45, 50, 60] : [4, 6, 8, 10, 12, 14, 16, 18, 20];
+          body.innerHTML = `<div class="ez-chips">${sizes.map(s => `<button class="ez-chip ${st.mm === s ? 'sel' : ''}" data-m="${s}">${s}mm</button>`).join('')}
+            <button class="ez-chip ghost" data-m="">わからない</button></div>`;
+          $$('[data-m]', body).forEach(b => b.onclick = () => { st.mm = b.dataset.m ? Number(b.dataset.m) : ''; next(); });
+        }
+      },
+      { q: () => '何個ですか？', hint: () => '数字を押すか、＋−で合わせてください。', render(body, st, next) { keypad(body, st.qty, { unit: '個', stepper: true }, n => { st.qty = n; next(); }); } },
+      {
+        q: () => '全部でいくらでしたか？', hint: () => '送料も含めた、払った合計です。',
+        render(body, st, next) { keypad(body, st.amount, { unit: '円', sub: n => n && st.qty ? `1個あたり 約${Y(n / st.qty)}円` : '' }, n => { st.amount = n; next(); }); }
+      },
+      {
+        q: () => 'どのお金で払いましたか？',
+        render(body, st, next) {
+          const items = PAY_FROM.map(p => ({ v: p.acc, t: p.t, d: p.d, art: p.art })).concat([{ v: 'none', t: 'もう記録してある', d: 'カード明細などで記録ずみ', art: `<svg viewBox="0 0 40 40" width="48" height="48" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="#E3F4EE"/><path d="M13 20.5l4.5 4.5L27 15.5" stroke="#2E9E7B" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>` }]);
+          choices(body, items, st.from, it => { st.from = it.v; st.fromName = it.t; next(); }, { one: true });
+        }
+      },
+      dateStep(),
+      {
+        q: () => 'これで記録しますか？', hint: () => 'まちがいがあれば「直す」を押してください。',
+        render(body, st) {
+          const size = st.shape + (st.mm ? ' ' + st.mm + 'mm' : '');
+          body.innerHTML = `<div style="display:flex;align-items:center;gap:14px;margin:0 2px 14px">${st.shape === '勾玉' ? magatama(st.stone, 64) : gem(st.stone, 60)}<div><b style="font-size:22px">${H(st.stone)}</b><div style="color:#7B82A0">${H(size)}</div></div></div>
+            <div class="ez-confirm">
+              <div class="r total"><span>合計</span><b>${Y(st.amount)}円</b><button data-s="4">直す</button></div>
+              <div class="r"><span>個数</span><b>${Y(st.qty)}個（1個 約${Y(st.amount / st.qty)}円）</b><button data-s="3">直す</button></div>
+              <div class="r"><span>払ったお金</span><b>${H(st.fromName)}</b><button data-s="5">直す</button></div>
+              <div class="r"><span>日にち</span><b>${jpDate(st.date)}</b><button data-s="6">直す</button></div>
+              <label class="r" style="display:block"><span style="display:block;margin-bottom:6px">どこで買った？（書かなくても大丈夫）</span>
+                <input id="ezMemo" value="${H(st.memo || '')}" placeholder="例：〇〇ビーズ、メルカリ" style="width:100%;min-height:54px;border:2px solid #E3E5F0;border-radius:16px;padding:0 14px;font-size:18px"></label></div>`;
+          $$('[data-s]', body).forEach(b => b.onclick = () => step(Number(b.dataset.s)));
+          const c = cta(`<button class="ez-btn jade" id="ezSave">${IC.check.replace('<svg', '<svg width="26" height="26"')}記録する</button>`);
+          $('#ezSave', c).onclick = async () => {
+            st.memo = $('#ezMemo').value.trim();
+            $('#ezSave', c).disabled = true;
+            try {
+              await call('addLots', { date: st.date, kind: '仕入', lines: [{ stone: st.stone, size, qty: st.qty, amount: st.amount }], partner: st.memo, note: st.memo,
+                extra: 0, credit: st.from === 'none' ? '' : st.from, makeEntry: st.from !== 'none' });
+              done(`${H(st.stone)}を${Y(st.qty)}個 記録しました`, `${jpDate(st.date)}・${Y(st.amount)}円`, buyFlow);
+            } catch (e) { $('#ezSave', c).disabled = false; toast(e.message || String(e), true); }
+          };
+        }
+      }
+    ], { date: ymd(new Date()) });
+  }
+
+  function done(title, sub, again) {
+    E.flow = null;
+    root.innerHTML = `<div class="ez-wrap"><div class="ez-done"><div class="ok">${IC.check}</div><h2>${title}</h2><p>${H(sub)}</p><p style="font-size:15px">帳簿にも自動で入りました。</p></div></div>`;
+    const c = cta(`<button class="ez-btn sub" id="ezHome">ホームへ</button><button class="ez-btn" id="ezAgain">続けて記録する</button>`);
+    $('#ezHome', c).onclick = () => show('home');
+    $('#ezAgain', c).onclick = again;
+  }
+
+  /* ───────── 在庫 ───────── */
+  VIEWS.stock = async () => {
+    const dates = await call('inventoryDates');
+    const last = dates[0];
+    const inv = last ? await call('inventory', { date: last.date }) : { rows: [] };
+    const rows = inv.rows.map(r => Object.assign({}, r, { qty0: Number(r.qty) || 0, qty: Number(r.qty) || 0 }));
+    E.data.stockRows = rows;
+    const groups = {};
+    rows.forEach((r, i) => { (groups[r.item || 'その他'] = groups[r.item || 'その他'] || []).push(i); });
+    const names = Object.keys(groups).sort((a, b) => groups[b].reduce((s, i) => s + rows[i].qty, 0) - groups[a].reduce((s, i) => s + rows[i].qty, 0));
+    const total = rows.reduce((s, r) => s + r.qty, 0);
+    root.innerHTML = `
+      <div class="ez-top"><div class="ez-hello"><b>在庫</b><span>${last ? `${jpDate(last.date)}に数えた数・全部で ${Y(total)}個` : 'まだ数えた記録がありません'}</span></div></div>
+      <div class="ez-wrap">
+        ${last ? `<p class="ez-hint" style="margin-top:8px">石を押すと、大きさごとの数が出ます。数が違っていたら −／＋ で直して「保存する」を押してください。</p>
+          ${names.map(n => `<div class="ez-stock" data-n="${H(n)}"><button aria-expanded="false">${groups[n].some(i => /勾玉/.test(rows[i].spec)) && !groups[n].some(i => /丸玉/.test(rows[i].spec)) ? magatama(n, 52) : gem(n, 50)}
+              <div class="tx"><b>${H(n)}</b><span>${groups[n].length}種類の大きさ</span></div><div class="n" data-sum>${Y(groups[n].reduce((s, i) => s + rows[i].qty, 0))}<small>個</small></div></button>
+              <div class="sizes" hidden>${groups[n].map(i => `<div class="ez-size" data-i="${i}"><div class="nm">${H(rows[i].spec || '大きさの記録なし')}<span>${rows[i].unit_cost ? `1個 ${Y(rows[i].unit_cost)}円` : ''}</span></div>
+                <button data-d="-1" aria-label="1つ減らす">−</button><input inputmode="numeric" value="${rows[i].qty}" aria-label="${H(n)} ${H(rows[i].spec)} の数"><button data-d="1" aria-label="1つ増やす">＋</button></div>`).join('')}</div></div>`).join('')}`
+        : `<div class="ez-list" style="margin-top:14px"><div class="ez-empty"><div style="width:96px;margin:0 auto 8px">${ART.stock()}</div>在庫の数は、パソコンの「くわしい画面」の棚卸から一度まとめて入れると、ここで見たり直したりできます。</div></div>`}
+      </div>`;
+    $$('.ez-stock > button', root).forEach(b => b.onclick = () => { const s = b.nextElementSibling; s.hidden = !s.hidden; b.setAttribute('aria-expanded', String(!s.hidden)); });
+    const changed = () => {
+      const n = rows.filter(r => r.qty !== r.qty0).length;
+      root.style.paddingBottom = n ? 'calc(190px + env(safe-area-inset-bottom))' : '';
+      if (!n) return ctaOff();
+      if (!$('#ezCta')) {
+        const c = cta(`<button class="ez-btn sub" id="ezUndo">元に戻す</button><button class="ez-btn" id="ezSaveInv">保存する</button>`, true);
+        $('#ezUndo', c).onclick = () => show('stock');
+        $('#ezSaveInv', c).onclick = saveStock;
+      }
+      $('#ezSaveInv').textContent = `${n}か所を保存する`;
+    };
+    $$('.ez-size', root).forEach(el => {
+      const r = rows[Number(el.dataset.i)], inp = $('input', el);
+      const set = v => {
+        r.qty = Math.max(0, Math.round(Number(v) || 0)); inp.value = r.qty; el.classList.toggle('chg', r.qty !== r.qty0);
+        const card = el.closest('.ez-stock'), idx = groups[card.dataset.n];
+        $('[data-sum]', card).innerHTML = `${Y(idx.reduce((s, i) => s + rows[i].qty, 0))}<small>個</small>`;
+        changed();
+      };
+      $$('button', el).forEach(b => b.onclick = () => set(r.qty + Number(b.dataset.d)));
+      inp.onchange = () => set(inp.value.normalize('NFKC'));
+    });
+  };
+  async function saveStock() {
+    const rows = E.data.stockRows.map(r => ({ category: r.category, item: r.item, spec: r.spec, unit: r.unit, qty: r.qty, unit_cost: r.unit_cost, note: r.note }));
+    const today = ymd(new Date());
+    try {
+      await call('saveInventory', { date: today, rows });
+      toast(`在庫を保存しました（${jpDate(today)}の数として残しました）`);
+      show('stock');
+    } catch (e) { toast(e.message || String(e), true); }
+  }
+
+  /* ───────── 売れた石 ───────── */
+  VIEWS.best = async () => {
+    E.data.bestPeriod = E.data.bestPeriod || 'year';
+    const m = new Date().getMonth() + 1;
+    const st = await call('salesStats', E.data.bestPeriod === 'month' ? { year: year(), month: m } : { year: year() });
+    const list = (st.byStone || []).filter(s => s.name && s.name !== 'その他').concat((st.byStone || []).filter(s => s.name === 'その他'));
+    const max = Math.max(1, ...list.map(s => s.price));
+    root.innerHTML = `
+      <div class="ez-top"><div class="ez-hello"><b>売れた石</b><span>${E.data.bestPeriod === 'month' ? m + '月' : year() + '年'}に ${Y(st.total.count)}個・${Y(st.total.price)}円</span></div></div>
+      <div class="ez-wrap">
+        <div class="ez-seg" role="tablist"><button data-p="month" class="${E.data.bestPeriod === 'month' ? 'on' : ''}">今月</button><button data-p="year" class="${E.data.bestPeriod === 'year' ? 'on' : ''}">今年</button></div>
+        ${list.length ? list.map((s, k) => `<button class="ez-rank" data-k="${k}"><span class="no ${k < 3 ? 'g' + (k + 1) : ''}">${k + 1}</span>${gem(s.name, 46)}
+          <div class="tx"><b>${H(s.name)}</b><div class="bar"><i style="width:${Math.max(4, s.price / max * 100)}%"></i></div></div>
+          <div class="v"><b>${Y(s.price)}円</b><span>${Y(s.count)}個</span></div></button>`).join('')
+        : '<div class="ez-list"><div class="ez-empty">この期間に売れた記録はまだありません。<br>ヤフオクやメルカリの売上を取り込むと、ここに並びます。</div></div>'}
+      </div>`;
+    $$('[data-p]', root).forEach(b => b.onclick = () => { E.data.bestPeriod = b.dataset.p; show('best'); });
+    $$('.ez-rank', root).forEach(b => b.onclick = () => stoneSheet(list[Number(b.dataset.k)]));
+  };
+  function stoneSheet(s) {
+    sheet(`<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">${gem(s.name, 64)}<div><b style="font-size:24px">${H(s.name)}</b>
+        <div style="color:#7B82A0">${Y(s.count)}個売れて ${Y(s.price)}円・平均 ${Y(s.avg)}円</div></div></div>
+      <h3 class="ez-h" style="margin-top:6px">最近売れたもの</h3>
+      <div class="ez-list">${(s.recent || []).map(r => `<div class="ez-row"><div class="ic">${r.shape === '勾玉' ? magatama(s.name, 30) : gem(s.name, 28)}</div>
+        <div class="tx"><b>${H(String(r.title || '').replace(/[【】★☆]/g, ' ').trim())}</b><span>${jpDate(r.date)}・${H(r.site)}</span></div><div class="amt">${Y(r.price)}円</div></div>`).join('')}</div>`);
+  }
+
+  /* ───────── 下から出る画面 ───────── */
+  function sheet(html) {
+    closeSheet();
+    const m = document.createElement('div'); m.className = 'ez-sheet'; m.id = 'ezSheet';
+    m.innerHTML = `<div class="pane" role="dialog" aria-modal="true"><div class="grab"></div>${html}
+      <button class="ez-btn sub" id="ezClose" style="width:100%;margin-top:16px;flex:none">閉じる</button></div>`;
+    document.body.appendChild(m);
+    m.onclick = e => { if (e.target === m) closeSheet(); };
+    $('#ezClose', m).onclick = closeSheet;
+    return m;
+  }
+  function closeSheet() { const m = $('#ezSheet'); if (m) m.remove(); }
+  function addSheet() {
+    const m = sheet(`<h2 class="ez-q" style="margin-top:0">何を記録しますか？</h2>
+      <div class="ez-choices one">
+        <button class="ez-choice" data-a="pay"><div class="art" style="width:60px;height:60px">${ART.pay}</div><div><b>お金を払った</b><span>送料・道具・交通費など</span></div></button>
+        <button class="ez-choice" data-a="buy"><div class="art" style="width:60px;height:60px">${ART.buy()}</div><div><b>石を仕入れた</b><span>買った石の種類・数・金額</span></div></button>
+      </div>`);
+    $$('[data-a]', m).forEach(b => b.onclick = () => { closeSheet(); b.dataset.a === 'pay' ? payFlow() : buyFlow(); });
+  }
+  function moreSheet() {
+    const L = window.LEDGER || {};
+    const m = sheet(`<h2 class="ez-q" style="margin-top:0">そのほか</h2>
+      <div class="ez-list">
+        <button class="ez-row" data-a="sales"><div class="ic" style="background:#ECE9FC"><div style="width:34px;height:34px">${ART.import}</div></div><div class="tx"><b>売上を取り込む</b><span>ヤフオク・メルカリの売上</span></div><span class="chev">›</span></button>
+        <button class="ez-row" data-a="full"><div class="ic">${IC.menu.replace('<svg', '<svg style="color:#4A5378"')}</div><div class="tx"><b>くわしい画面にする</b><span>帳簿・決算書・設定など、すべての機能</span></div><span class="chev">›</span></button>
+        <button class="ez-row" data-a="help"><div class="ic">${IC.help}</div><div class="tx"><b>使い方</b><span>困ったときに</span></div><span class="chev">›</span></button>
+        ${L.mode === 'cloud' ? `<button class="ez-row" data-a="out"><div class="ic">${IC.back.replace('<svg', '<svg style="color:#D9534F"')}</div><div class="tx"><b>ログアウト</b><span>${H(L.user)} でログイン中</span></div><span class="chev">›</span></button>` : ''}
+      </div>`);
+    $$('[data-a]', m).forEach(b => b.onclick = () => {
+      const a = b.dataset.a; closeSheet();
+      if (a === 'full') leave();
+      else if (a === 'sales') { leave(); setMode('easy'); setTimeout(() => window.go && window.go('sales'), 50); backPill(); }
+      else if (a === 'help') helpSheet();
+      else if (a === 'out' && window.LEDGER_UI) window.LEDGER_UI.logout();
+    });
+  }
+  function helpSheet() {
+    sheet(`<h2 class="ez-q" style="margin-top:0">使い方</h2>
+      <div class="ez-list">
+        <div class="ez-row"><div class="ic"><div style="width:36px">${ART.pay}</div></div><div class="tx" style="white-space:normal"><b>お金を払ったとき</b><span style="display:block">「お金を払った」を押して、質問に答えるだけです。レシートは捨てずに取っておいてください。</span></div></div>
+        <div class="ez-row"><div class="ic"><div style="width:36px">${ART.buy()}</div></div><div class="tx"><b>石を買ったとき</b><span style="display:block;white-space:normal">「石を仕入れた」で、石・形・大きさ・個数・金額を入れます。在庫や1個の値段が自動でわかります。</span></div></div>
+        <div class="ez-row"><div class="ic"><div style="width:36px">${ART.stock()}</div></div><div class="tx"><b>在庫を数えたとき</b><span style="display:block;white-space:normal">「在庫」で数を −／＋ で直して保存します。年末（12月31日）にもう一度数えると安心です。</span></div></div>
+      </div>
+      <p class="ez-hint" style="margin-top:14px">記録したものは、まちがえても「くわしい画面」の帳簿から取り消せます。わからないときは、無理に進めずにそのままにしておいて大丈夫です。</p>`);
+  }
+  /** くわしい画面から、かんたん画面へ戻るボタン */
+  function backPill() {
+    if ($('#ezBackPill')) return;
+    const b = document.createElement('button');
+    b.id = 'ezBackPill'; b.type = 'button'; b.textContent = 'かんたん画面にもどる';
+    b.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom));z-index:29;border:0;border-radius:999px;padding:14px 22px;font:700 17px/1 inherit;color:#fff;background:#1E2A5A;box-shadow:0 12px 24px -12px rgba(30,42,90,.8)';
+    b.onclick = () => { b.remove(); enter(); };
+    document.body.appendChild(b);
+  }
+
+  /* くわしい画面のメニューに「かんたん画面」を足す */
+  new MutationObserver(() => {
+    const ms = document.getElementById('moreSheet');
+    if (ms && !ms.querySelector('.ez-switch')) {
+      const host = ms.querySelector('div') || ms;
+      const b = document.createElement('a');
+      b.className = 'ez-switch'; b.href = '#';
+      b.innerHTML = '<span style="font-weight:700">かんたん画面にする</span>';
+      b.style.cssText = 'display:block;padding:16px 18px;margin:0 0 8px;border-radius:16px;background:#ECE9FC;color:#3E2FA6;text-decoration:none;font-size:17px';
+      b.onclick = e => { e.preventDefault(); enter(); };
+      host.insertBefore(b, host.firstChild);
+    }
+  }).observe(document.body, { childList: true, subtree: true });
+
+  window.EASY = { enter, leave };
+
+  /* 起動：スマホでは最初からかんたん画面（くわしい画面を選んだ人はそのまま） */
+  const wait = setInterval(() => {
+    if (!(typeof S !== 'undefined' && S.boot)) return;
+    clearInterval(wait);
+    const m = getMode();
+    if (m === 'easy' || (!m && window.matchMedia('(max-width: 720px)').matches)) enter();
+  }, 120);
+})();
+
+</script>
 </body>
 </html>
